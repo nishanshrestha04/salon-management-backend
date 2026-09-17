@@ -22,7 +22,7 @@ class Appointment(models.Model):
 
     customer_name = models.CharField(max_length=100)
     customer_phone = models.CharField(max_length=20)
-    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='appointments')
+    service = models.ForeignKey(Service, on_delete=models.PROTECT, related_name='appointments')
     appointment_date = models.DateField()
     appointment_time = models.TimeField()
     notes = models.TextField(blank=True, default="")

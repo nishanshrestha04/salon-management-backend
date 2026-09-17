@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.db.models import ProtectedError
 from .models import Service, Appointment
 from .serializers import ServiceSerializer, AppointmentSerializer
 
@@ -40,8 +41,14 @@ def service_detail(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        service.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            service.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except ProtectedError:
+            return Response(
+                {"error": "Cannot delete this service because it has existing appointments associated with it."}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 @api_view(['GET', 'POST'])
 def appointment_list_create(request):
